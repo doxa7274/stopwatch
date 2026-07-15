@@ -1,4 +1,4 @@
-﻿using DotNetBungieAPI.Models.Destiny.Components;
+using DotNetBungieAPI.Models.Destiny.Components;
 
 using steam.Interception.PacketProviders;
 using steam.Models;
@@ -31,6 +31,7 @@ namespace steam.Interception.Modules
             KeyListener.KeysPressed += OutboundHandler;
             KeyListener.KeysPressed += SlowInboundHandler;
             KeyListener.KeysPressed += SlowOutboundHandler;
+            KeyListener.KeysPressed += ReinjectHandler;
 
             Buffer = Config.GetNamed(Name).GetSettings<bool>("Buffer");
             AutoResync = Config.GetNamed(Name).GetSettings<bool>("AutoResync");
@@ -38,6 +39,7 @@ namespace steam.Interception.Modules
             OutboundKeybind.AddRange(Config.GetNamed(Name).GetSettings<List<Keycode>>("OutboundKeybind"));
             SlowInboundKeybind.AddRange(Config.GetNamed(Name).GetSettings<List<Keycode>>("SlowInboundKeybind"));
             SlowOutboundKeybind.AddRange(Config.GetNamed(Name).GetSettings<List<Keycode>>("SlowOutboundKeybind"));
+            ReinjectKeybind.AddRange(Config.GetNamed(Name).GetSettings<List<Keycode>>("ReinjectKeybind"));
         }
 
         public override void StartListening()
@@ -91,6 +93,24 @@ namespace steam.Interception.Modules
                 ToggleSwitch(ref SlowOutbound);
             }
         }
+        private void ReinjectHandler(LinkedList<Keycode> keycodes)
+        {
+            if (!KeybindChecks()) return;
+
+            if (!ReinjectKeybind.Any() || keycodes.Count < ReinjectKeybind.Count) return;
+
+            if (!ReinjectKeybind.All(x => keycodes.Contains(x)))
+                return;
+
+            latestTrigger = DateTime.Now;
+            Logger.Info($"{Name}: Reinject pulse [3074]");
+
+            Task.Run(async () =>
+            {
+                await xbox.ClearDelayQueue(null, true, 0);
+                MainWindow.Instance.Dispatcher.BeginInvoke(() => MainWindow.Instance.FlashReinject());
+            });
+        }
 
 
 
@@ -105,6 +125,7 @@ namespace steam.Interception.Modules
         public static List<Keycode> SlowInboundKeybind = new List<Keycode>();
         public static List<Keycode> SlowOutboundKeybind = new List<Keycode>();
         public static List<Keycode> OutboundKeybind = new List<Keycode>();
+        public static List<Keycode> ReinjectKeybind = new List<Keycode>();
 
         public void ToggleSwitch(ref bool target, bool? enable = null)
         {

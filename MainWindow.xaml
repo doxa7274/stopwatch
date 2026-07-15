@@ -1,4 +1,4 @@
-﻿<Window
+<Window
     x:Class="steam.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -430,5 +430,6 @@
             IconSource="Assets/appLogo.ico"
             Visibility="Hidden"/>
     </Grid>
+</Window>
 </Window>
 

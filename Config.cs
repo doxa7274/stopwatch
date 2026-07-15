@@ -1,4 +1,4 @@
-﻿using steam.Models;
+using steam.Models;
 using steam.Utility;
 using steam.Interception;
 

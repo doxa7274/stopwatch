@@ -1,4 +1,4 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
+using Hardcodet.Wpf.TaskbarNotification;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic.Logging;
